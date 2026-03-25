@@ -31,10 +31,10 @@ Product.delete_all
 url = "https://dummyjson.com/products?limit=200"
 data = JSON.parse(URI.open(url).read)
 
-data.each do |item|
+data["products"].each do |item|
   category = Category.find_or_create_by(name: item["category"])
 
-  Product.create!(
+  product = Product.create!(
     title: item["title"],
     description: item["description"],
     price: item["price"],
