@@ -1,0 +1,123 @@
+<section class="cart-page">
+  <div class="cart-page__panel p-3 p-lg-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+      <div>
+        <h1 class="h2 mb-1">Your Cart</h1>
+        <p class="cart-page__meta mb-0">
+          <%= pluralize(@cart.total_quantity, "item") %> currently saved to your account.
+        </p>
+      </div>
+
+      <%= link_to "Continue Shopping", products_path, class: "btn btn-outline-secondary" %>
+    </div>
+
+    <% if @cart_items.any? %>
+      <div class="cart-list">
+        <% @cart_items.each do |cart_item| %>
+          <% product = cart_item.product %>
+
+          <article class="cart-item">
+            <div class="cart-item__media">
+              <% if product.image.attached? %>
+                <%= image_tag product.image, alt: product.title %>
+              <% else %>
+                <div class="cart-item__placeholder">No image</div>
+              <% end %>
+            </div>
+
+            <div class="cart-item__body">
+              <div class="cart-item__details">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <span class="badge text-bg-light border"><%= product.category.name %></span>
+                  <% if cart_item.discounted? %>
+                    <span class="badge text-bg-warning">On Sale</span>
+                  <% end %>
+                </div>
+
+                <h2 class="cart-item__title h4 mb-2">
+                  <%= link_to product.title, product_path(product), class: "text-decoration-none" %>
+                </h2>
+
+                <p class="cart-item__description mb-2"><%= truncate(product.description, length: 160) %></p>
+
+                <div class="cart-item__pricing">
+                  <% if cart_item.discounted? %>
+                    <div class="product-discount-text">
+                      <%= number_to_percentage(product.discount_percentage, precision: 0) %> off!
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      <span class="product-sale-price"><%= number_to_currency(cart_item.unit_price) %></span>
+                      <span class="product-original-price"><%= number_to_currency(product.price) %></span>
+                    </div>
+                  <% else %>
+                    <span class="cart-item__regular-price"><%= number_to_currency(product.price) %></span>
+                  <% end %>
+                </div>
+              </div>
+
+              <div class="cart-item__actions">
+                <%= form_with url: cart_item_path(cart_item), method: :patch, local: true, data: { controller: "quantity-picker" } do %>
+                  <label class="product-show__purchase-label" for="<%= dom_id(cart_item, :quantity) %>">Quantity</label>
+                  <div class="d-flex flex-wrap align-items-center gap-3">
+                    <div class="product-quantity-picker">
+                      <button type="button"
+                              class="product-quantity-picker__button"
+                              aria-label="Decrease quantity"
+                              data-action="click->quantity-picker#decrease">-</button>
+                      <%= number_field_tag :quantity,
+                                           cart_item.quantity,
+                                           min: 1,
+                                           step: 1,
+                                           id: dom_id(cart_item, :quantity),
+                                           class: "product-quantity-picker__input",
+                                           data: { quantity_picker_target: "input" },
+                                           aria: { label: "Quantity for #{product.title}" } %>
+                      <button type="button"
+                              class="product-quantity-picker__button"
+                              aria-label="Increase quantity"
+                              data-action="click->quantity-picker#increase">+</button>
+                    </div>
+
+                    <%= submit_tag "Update Quantity", class: "btn btn-outline-primary" %>
+                  </div>
+                <% end %>
+
+                <div class="cart-item__line-total mt-3">
+                  Line Total: <strong><%= number_to_currency(cart_item.line_total) %></strong>
+                </div>
+              </div>
+            </div>
+          </article>
+        <% end %>
+      </div>
+
+      <div class="cart-summary mt-4">
+        <div class="cart-summary__row">
+          <span>Items</span>
+          <strong><%= @cart.total_quantity %></strong>
+        </div>
+        <div class="cart-summary__row">
+          <span>Subtotal</span>
+          <strong><%= number_to_currency(@cart.subtotal) %></strong>
+        </div>
+        <div class="cart-summary__row cart-summary__row--total">
+          <span>Total</span>
+          <strong><%= number_to_currency(@cart.subtotal) %></strong>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mt-4">
+          <%= link_to "Continue Shopping", products_path, class: "btn btn-outline-secondary" %>
+          <button type="button" class="btn btn-primary" disabled>Checkout</button>
+        </div>
+
+        <p class="cart-summary__note mb-0 mt-2">Checkout will be connected in the next step.</p>
+      </div>
+    <% else %>
+      <div class="catalog-empty p-4">
+        <h2 class="h4 mb-2">Your cart is empty</h2>
+        <p class="mb-3">Browse the catalog and add products to start building your order.</p>
+        <%= link_to "Browse Products", products_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</section>

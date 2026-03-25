@@ -14,4 +14,12 @@ class Cart < ApplicationRecord
     cart_item.save!
     cart_item
   end
+
+  def total_quantity
+    cart_items.sum(:quantity)
+  end
+
+  def subtotal
+    cart_items.includes(:product).sum(&:line_total)
+  end
 end

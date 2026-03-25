@@ -12,6 +12,9 @@ Rails.application.routes.draw do
 
   root "product#index"
 
+  get "/cart", to: "cart#index", as: :cart
+  patch "/cart/items/:id", to: "cart#update_item", as: :cart_item
+
   resources :products, only: %i[index show], controller: "product" do
     post :add_to_cart, on: :member
   end
