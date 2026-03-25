@@ -82,8 +82,16 @@
                   </div>
                 <% end %>
 
-                <div class="cart-item__line-total mt-3">
-                  Line Total: <strong><%= number_to_currency(cart_item.line_total) %></strong>
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+                  <div class="cart-item__line-total">
+                    Line Total: <strong><%= number_to_currency(cart_item.line_total) %></strong>
+                  </div>
+
+                  <%= button_to "Remove from cart",
+                                cart_item_path(cart_item),
+                                method: :delete,
+                                class: "btn btn-outline-danger btn-sm",
+                                form: { class: "d-inline-block mb-0" } %>
                 </div>
               </div>
             </div>
@@ -107,10 +115,19 @@
 
         <div class="d-flex flex-wrap gap-2 mt-4">
           <%= link_to "Continue Shopping", products_path, class: "btn btn-outline-secondary" %>
-          <button type="button" class="btn btn-primary" disabled>Checkout</button>
+          <%= button_to "Checkout",
+                        checkout_path,
+                        method: :post,
+                        class: "btn btn-primary",
+                        disabled: !stripe_checkout_configured?,
+                        form: { class: "d-inline-block mb-0", data: { turbo: false } } %>
         </div>
 
-        <p class="cart-summary__note mb-0 mt-2">Checkout will be connected in the next step.</p>
+        <% if stripe_checkout_configured? %>
+          <p class="cart-summary__note mb-0 mt-2">Secure payment is handled in Stripe test mode.</p>
+        <% else %>
+          <p class="cart-summary__note mb-0 mt-2">Add your Stripe test keys to enable checkout.</p>
+        <% end %>
       </div>
     <% else %>
       <div class="catalog-empty p-4">

@@ -1,7 +1,7 @@
 class CartController < ApplicationController
   before_action :authenticate_customer!
   before_action :set_cart
-  before_action :set_cart_item, only: :update_item
+  before_action :set_cart_item, only: %i[update_item destroy_item]
 
   def index
     @cart_items = @cart.cart_items.includes(product: [:category, { image_attachment: :blob }]).order(created_at: :desc)
@@ -24,6 +24,12 @@ class CartController < ApplicationController
     else
       redirect_to cart_path, alert: @cart_item.errors.full_messages.to_sentence.presence || "We couldn't update that item."
     end
+  end
+
+  def destroy_item
+    product_title = @cart_item.product.title
+    @cart_item.destroy
+    redirect_to cart_path, notice: "#{product_title} removed from your cart."
   end
 
   private

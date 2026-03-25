@@ -14,4 +14,8 @@ module ApplicationHelper
 
     current_customer.cart&.total_quantity.to_i
   end
+
+  def stripe_checkout_configured?
+    Rails.configuration.x.stripe.secret_key.present?
+  end
 end

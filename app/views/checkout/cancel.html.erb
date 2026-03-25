@@ -1,0 +1,26 @@
+<section class="checkout-page">
+  <div class="checkout-page__panel p-3 p-lg-4">
+    <div class="checkout-page__header mb-4">
+      <h1 class="h2 mb-2">Checkout Cancelled</h1>
+      <p class="checkout-page__meta mb-0">Your payment was not completed. Items remain in your cart, so you can review and try again.</p>
+    </div>
+
+    <% if @order.present? %>
+      <div class="checkout-summary">
+        <div class="checkout-summary__row">
+          <span>Order Status</span>
+          <strong><%= @order.status.humanize %></strong>
+        </div>
+        <div class="checkout-summary__row checkout-summary__row--total">
+          <span>Pending Total</span>
+          <strong><%= number_to_currency(@order.total_price) %></strong>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="d-flex flex-wrap gap-2 mt-4">
+      <%= link_to "Return to Cart", cart_path, class: "btn btn-primary" %>
+      <%= link_to "Continue Shopping", products_path, class: "btn btn-outline-secondary" %>
+    </div>
+  </div>
+</section>

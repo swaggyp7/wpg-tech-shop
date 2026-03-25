@@ -14,6 +14,11 @@ Rails.application.routes.draw do
 
   get "/cart", to: "cart#index", as: :cart
   patch "/cart/items/:id", to: "cart#update_item", as: :cart_item
+  delete "/cart/items/:id", to: "cart#destroy_item"
+  post "/checkout", to: "checkout#create", as: :checkout
+  get "/checkout/success", to: "checkout#success", as: :checkout_success
+  get "/checkout/cancel", to: "checkout#cancel", as: :checkout_cancel
+  post "/stripe/webhooks", to: "stripe_webhooks#create"
 
   resources :products, only: %i[index show], controller: "product" do
     post :add_to_cart, on: :member

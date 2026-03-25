@@ -1,0 +1,47 @@
+<section class="checkout-page">
+  <div class="checkout-page__panel p-3 p-lg-4">
+    <div class="checkout-page__header mb-4">
+      <h1 class="h2 mb-2">Checkout Complete</h1>
+      <% if @session.payment_status == "paid" %>
+        <p class="checkout-page__meta mb-0">Payment confirmed in Stripe test mode. Your order snapshot is now saved.</p>
+      <% else %>
+        <p class="checkout-page__meta mb-0">We reached Stripe, but payment is not marked paid yet.</p>
+      <% end %>
+    </div>
+
+    <div class="checkout-summary">
+      <div class="checkout-summary__row">
+        <span>Order Status</span>
+        <strong><%= @order.status.humanize %></strong>
+      </div>
+      <div class="checkout-summary__row">
+        <span>Order Date</span>
+        <strong><%= l(@order.order_date, format: :long) %></strong>
+      </div>
+      <div class="checkout-summary__row checkout-summary__row--total">
+        <span>Total Paid</span>
+        <strong><%= number_to_currency(@order.total_price) %></strong>
+      </div>
+    </div>
+
+    <div class="checkout-items mt-4">
+      <% @order.order_items.each do |order_item| %>
+        <div class="checkout-item">
+          <div>
+            <h2 class="h5 mb-1"><%= order_item.product.title %></h2>
+            <p class="checkout-page__meta mb-0">
+              <%= pluralize(order_item.quantity, "unit") %> at <%= number_to_currency(order_item.price_at_purchase) %> each
+            </p>
+          </div>
+
+          <strong><%= number_to_currency(order_item.line_total) %></strong>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mt-4">
+      <%= link_to "Continue Shopping", products_path, class: "btn btn-primary" %>
+      <%= link_to "Back to Cart", cart_path, class: "btn btn-outline-secondary" %>
+    </div>
+  </div>
+</section>

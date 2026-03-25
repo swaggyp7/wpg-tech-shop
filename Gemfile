@@ -72,5 +72,6 @@ gem "bootstrap", "~> 5.3"
 gem "kaminari"
 
 gem "devise", "~> 5.0"
+gem "stripe", "~> 18.4"
 
 gem "sassc-rails", "~> 2.1"

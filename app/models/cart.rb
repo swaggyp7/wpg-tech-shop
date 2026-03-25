@@ -22,4 +22,26 @@ class Cart < ApplicationRecord
   def subtotal
     cart_items.includes(:product).sum(&:line_total)
   end
+
+  def build_pending_order!
+    raise ArgumentError, "Your cart is empty." if cart_items.empty?
+
+    transaction do
+      order = customer.orders.create!(
+        order_date: Time.current,
+        total_price: subtotal,
+        status: "pending"
+      )
+
+      cart_items.includes(:product).find_each do |cart_item|
+        order.order_items.create!(
+          product: cart_item.product,
+          quantity: cart_item.quantity,
+          price_at_purchase: cart_item.unit_price
+        )
+      end
+
+      order
+    end
+  end
 end
