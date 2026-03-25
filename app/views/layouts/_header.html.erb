@@ -5,6 +5,21 @@
 
       <div class="d-flex flex-wrap align-items-center gap-2 ms-lg-auto">
         <%= link_to "Products", products_path, class: "nav-link px-2" %>
+
+        <% if customer_signed_in? %>
+          <span class="site-header__status text-white-50 px-2">
+            Signed in as <strong class="text-white"><%= customer_display_name(current_customer) %></strong>
+          </span>
+          <%= link_to "My Account", edit_customer_registration_path, class: "btn btn-outline-light btn-sm" %>
+          <%= button_to "Log out",
+                        destroy_customer_session_path,
+                        method: :delete,
+                        class: "btn btn-light btn-sm",
+                        form: { class: "d-inline-block mb-0" } %>
+        <% else %>
+          <%= link_to "Log in", new_customer_session_path, class: "btn btn-outline-light btn-sm" %>
+          <%= link_to "Sign up", new_customer_registration_path, class: "btn btn-light btn-sm" %>
+        <% end %>
       </div>
     </div>
   </nav>
