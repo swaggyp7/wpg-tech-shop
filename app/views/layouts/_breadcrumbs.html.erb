@@ -1,0 +1,15 @@
+<nav aria-label="breadcrumb" class="site-breadcrumbs mb-4">
+  <ol class="breadcrumb mb-0">
+    <% @breadcrumbs.each_with_index do |crumb, index| %>
+      <% if index == @breadcrumbs.size - 1 %>
+        <li class="<%= breadcrumb_link_classes(index) %>" aria-current="page">
+          <%= crumb[:label] %>
+        </li>
+      <% else %>
+        <li class="<%= breadcrumb_link_classes(index) %>">
+          <%= link_to crumb[:label], crumb[:path] %>
+        </li>
+      <% end %>
+    <% end %>
+  </ol>
+</nav>

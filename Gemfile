@@ -68,6 +68,8 @@ group :test do
 end
 
 gem "activeadmin", "~> 3.5"
+gem "bootstrap", "~> 5.3"
+gem "kaminari"
 
 gem "devise", "~> 5.0"
 

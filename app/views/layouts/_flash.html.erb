@@ -1,0 +1,10 @@
+<% if flash.any? %>
+  <div class="flash-stack mb-4">
+    <% flash.each do |type, message| %>
+      <div class="alert alert-light" role="alert">
+        <strong><%= type.to_s.humanize %>:</strong>
+        <%= message %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

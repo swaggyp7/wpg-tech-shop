@@ -11,6 +11,18 @@
   </head>
 
   <body>
-    <%= yield %>
+    <div class="site-shell">
+      <%= render "layouts/header" %>
+
+      <main class="site-main">
+        <div class="container py-4">
+          <%= render "layouts/flash" %>
+          <%= render "layouts/breadcrumbs" if breadcrumbs? %>
+          <%= yield %>
+        </div>
+      </main>
+
+      <%= render "layouts/footer" %>
+    </div>
   </body>
 </html>
