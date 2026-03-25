@@ -12,5 +12,7 @@ Rails.application.routes.draw do
 
   root "product#index"
 
-  resources :products, only: %i[index show], controller: "product"
+  resources :products, only: %i[index show], controller: "product" do
+    post :add_to_cart, on: :member
+  end
 end

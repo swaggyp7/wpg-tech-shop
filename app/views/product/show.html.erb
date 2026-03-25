@@ -35,20 +35,35 @@
         </div>
 
         <div class="product-show__purchase mb-4">
-          <div class="product-show__purchase-label">Quantity</div>
-          <div class="product-quantity-picker mb-3">
-            <button type="button" class="product-quantity-picker__button" aria-label="Decrease quantity">-</button>
-            <%= number_field_tag :quantity,
-                                 @quantity,
-                                 min: 1,
-                                 step: 1,
-                                 class: "product-quantity-picker__input",
-                                 aria: { label: "Quantity" } %>
-            <button type="button" class="product-quantity-picker__button" aria-label="Increase quantity">+</button>
-          </div>
+          <%= form_with url: add_to_cart_product_path(@product), method: :post, local: true, data: { controller: "quantity-picker" } do %>
+            <div class="product-show__purchase-label">Quantity</div>
+            <div class="product-quantity-picker mb-3">
+              <button type="button"
+                      class="product-quantity-picker__button"
+                      aria-label="Decrease quantity"
+                      data-action="click->quantity-picker#decrease">-</button>
+              <%= number_field_tag :quantity,
+                                   @quantity,
+                                   min: 1,
+                                   step: 1,
+                                   class: "product-quantity-picker__input",
+                                   data: { quantity_picker_target: "input" },
+                                   aria: { label: "Quantity" } %>
+              <button type="button"
+                      class="product-quantity-picker__button"
+                      aria-label="Increase quantity"
+                      data-action="click->quantity-picker#increase">+</button>
+            </div>
 
-          <button type="button" class="btn btn-primary product-show__cart-button">Add to Cart</button>
-          <p class="product-show__cart-note mt-2 mb-0">Cart functionality coming soon. This button is currently for layout only.</p>
+            <% if customer_signed_in? %>
+              <%= submit_tag "Add to Cart", class: "btn btn-primary product-show__cart-button" %>
+              <p class="product-show__cart-note mt-2 mb-0">Items are saved to your customer cart.</p>
+            <% else %>
+              <%= submit_tag "Log in to Add to Cart",
+                             class: "btn btn-primary product-show__cart-button" %>
+              <p class="product-show__cart-note mt-2 mb-0">Please sign in so the cart can be associated with your customer account.</p>
+            <% end %>
+          <% end %>
         </div>
 
         <div class="product-show__description">

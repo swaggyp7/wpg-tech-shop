@@ -1,5 +1,6 @@
 class ProductController < ApplicationController
-  before_action :set_product, only: :show
+  before_action :set_product, only: %i[show add_to_cart]
+  before_action :authenticate_customer!, only: :add_to_cart
 
   def index
     @categories = Category.order(:name)
@@ -23,6 +24,18 @@ class ProductController < ApplicationController
   def show
     @quantity = 1
     @breadcrumbs = build_show_breadcrumbs
+  end
+
+  def add_to_cart
+    quantity = params[:quantity].to_i
+    cart_item = current_customer.current_cart.add_product(@product, quantity)
+
+    redirect_to product_path(@product),
+                notice: "#{@product.title} added to your cart. Quantity in cart: #{cart_item.quantity}."
+  rescue ArgumentError
+    redirect_to product_path(@product), alert: "Please choose a quantity of at least 1."
+  rescue ActiveRecord::RecordInvalid
+    redirect_to product_path(@product), alert: "We couldn't add that product to your cart."
   end
 
   private

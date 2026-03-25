@@ -5,9 +5,13 @@ class Customer < ApplicationRecord
          :recoverable, :rememberable, :validatable
   has_many :orders
 
-  has_one :cart, dependent: :destory
+  has_one :cart, dependent: :destroy
   has_many :cart_items, through: :cart
 
   validates :name, presence: true
   validates :email, presence: true
+
+  def current_cart
+    cart || create_cart!
+  end
 end
