@@ -106,7 +106,7 @@
             <div class="d-flex justify-content-between align-items-end mt-auto gap-3">
               <div class="product-card__pricing">
                 <% if show_discount_price?(product) %>
-                  <div class="product-discount-text"><%= product.discount_percentage.to_i %>% off!</div>
+                  <div class="product-discount-text"><%= number_to_percentage(product.discount_percentage, precision: 0) %> off!</div>
                   <div class="d-flex flex-wrap align-items-center gap-2">
                     <span class="product-sale-price"><%= number_to_currency(discounted_price(product)) %></span>
                     <span class="product-original-price"><%= number_to_currency(product.price) %></span>
@@ -116,7 +116,7 @@
                 <% end %>
               </div>
 
-              <span class="btn btn-outline-secondary disabled product-card__cta">Details Coming Soon</span>
+              <%= link_to "View Details", product_path(product), class: "btn btn-outline-secondary product-card__cta" %>
             </div>
           </div>
         </article>

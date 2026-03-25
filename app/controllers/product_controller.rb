@@ -1,4 +1,6 @@
 class ProductController < ApplicationController
+  before_action :set_product, only: :show
+
   def index
     @categories = Category.order(:name)
     @search_query = params[:query].to_s.strip
@@ -15,10 +17,19 @@ class ProductController < ApplicationController
     @products = @products.where("products.price >= ?", @min_price) if @min_price.present?
     @products = @products.where("products.price <= ?", @max_price) if @max_price.present?
     @products = @products.order(sort_order).page(params[:page]).per(12)
-    @breadcrumbs = build_breadcrumbs
+    @breadcrumbs = build_index_breadcrumbs
+  end
+
+  def show
+    @quantity = 1
+    @breadcrumbs = build_show_breadcrumbs
   end
 
   private
+
+  def set_product
+    @product = Product.includes(:category, image_attachment: :blob).find(params[:id])
+  end
 
   def apply_query_filter(products)
     return products if @search_query.blank?
@@ -27,12 +38,19 @@ class ProductController < ApplicationController
     products.where("LOWER(products.title) LIKE ?", keyword)
   end
 
-  def build_breadcrumbs
-    crumbs = [
+  def build_index_breadcrumbs
+    [
       { label: "Home", path: root_path },
       { label: "Products", path: products_path }
     ]
-    return crumbs
+  end
+
+  def build_show_breadcrumbs
+    [
+      { label: "Home", path: root_path },
+      { label: "Products", path: products_path },
+      { label: @product.title, path: nil }
+    ]
   end
 
   def permitted_sort

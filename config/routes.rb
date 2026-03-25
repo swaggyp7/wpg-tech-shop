@@ -9,5 +9,5 @@ Rails.application.routes.draw do
 
   root "product#index"
 
-  resources :products, only: :index, controller: "product"
+  resources :products, only: %i[index show], controller: "product"
 end
