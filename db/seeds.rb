@@ -9,6 +9,8 @@
 #   end
 
 require "faker"
+require "open-uri"
+require "json"
 
 category_names = [
   "Laptops",
@@ -29,7 +31,7 @@ Faker::UniqueGenerator.clear
 # seed by faker
 100.times do |index|
   Product.create!(
-    title: "#{Faker::Commerce.product_name} #{index + 1}",
+    title: "#{Faker::Commerce.product_name}",
     description: Faker::Lorem.paragraph(sentence_count: 3),
     price: Faker::Commerce.price(range: 49.0..2999.0),
     stock_quantity: Faker::Number.between(from: 0, to: 150),
@@ -38,4 +40,19 @@ Faker::UniqueGenerator.clear
   )
 end
 
+# seed by api
+url = "https://fakestoreapi.com/products"
+data = JSON.parse(URI.open(url).read)
 
+data.each do |item|
+  category = Category.find_or_create_by(name: item["category"])
+
+  Product.create!(
+    title: item["title"],
+    description: item["description"],
+    price: item["price"],
+    stock_quantity: rand(5..99),
+    category: category,
+    on_sale: [true, false].sample
+  )
+end
