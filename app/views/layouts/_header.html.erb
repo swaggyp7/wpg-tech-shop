@@ -7,6 +7,17 @@
         <%= link_to "Products", products_path, class: "nav-link px-2" %>
 
         <% if customer_signed_in? %>
+          <span class="site-header__cart" aria-label="Shopping cart">
+            <span class="site-header__cart-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M3 4h2.3l1.1 2.6 1.8 7.6h9.6l2.3-6.8H8.1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+                <circle cx="10" cy="19" r="1.6" fill="currentColor"/>
+                <circle cx="18" cy="19" r="1.6" fill="currentColor"/>
+              </svg>
+            </span>
+            <span class="site-header__cart-badge"><%= current_cart_item_count %></span>
+          </span>
+
           <span class="site-header__status text-white-50 px-2">
             Signed in as <strong class="text-white"><%= customer_display_name(current_customer) %></strong>
           </span>

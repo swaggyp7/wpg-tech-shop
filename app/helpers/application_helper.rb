@@ -8,4 +8,10 @@ module ApplicationHelper
   def customer_display_name(customer)
     customer.name.presence || customer.email
   end
+
+  def current_cart_item_count
+    return 0 unless customer_signed_in?
+
+    current_customer.cart&.cart_items&.count()
+  end
 end
