@@ -18,6 +18,7 @@ ActiveAdmin.register Product do
     column :price
     column :stock_quantity
     column :category
+    column :discount_percentage
     column :on_sale
     column :image do |product|
       if product.image.attached?
@@ -35,6 +36,7 @@ ActiveAdmin.register Product do
       row :price
       row :stock_quantity
       row :category
+      row :discount_percentage
       row :on_sale
       row :image do |product|
         if product.image.attached?
@@ -51,6 +53,7 @@ ActiveAdmin.register Product do
       f.input :price
       f.input :stock_quantity
       f.input :category
+      f.input :discount_percentage
       f.input :on_sale
       f.input :image, as: :file
     end

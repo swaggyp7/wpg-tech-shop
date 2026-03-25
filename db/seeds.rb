@@ -12,36 +12,23 @@ require "faker"
 require "open-uri"
 require "json"
 
-category_names = [
-  "Laptops",
-  "Smartphones",
-  "Accessories",
-  "Gaming",
-  "Audio",
-  "Smart Home"
-]
-
-categories = category_names.map do |name|
-  Category.find_or_create_by!(name: name)
-end
-
 Product.delete_all
-Faker::UniqueGenerator.clear
+# Faker::UniqueGenerator.clear
 
 # seed by faker
-100.times do |index|
-  Product.create!(
-    title: "#{Faker::Commerce.product_name}",
-    description: Faker::Lorem.paragraph(sentence_count: 3),
-    price: Faker::Commerce.price(range: 49.0..2999.0),
-    stock_quantity: Faker::Number.between(from: 0, to: 150),
-    category: categories.sample,
-    on_sale: Faker::Boolean.boolean(true_ratio: 25)
-  )
-end
+# 100.times do |index|
+#   Product.create!(
+#     title: "#{Faker::Commerce.product_name}",
+#     description: Faker::Lorem.paragraph(sentence_count: 3),
+#     price: Faker::Commerce.price(range: 49.0..2999.0),
+#     stock_quantity: Faker::Number.between(from: 0, to: 150),
+#     category: categories.sample,
+#     on_sale: Faker::Boolean.boolean(true_ratio: 25)
+#   )
+# end
 
 # seed by api
-url = "https://fakestoreapi.com/products"
+url = "https://dummyjson.com/products?limit=200"
 data = JSON.parse(URI.open(url).read)
 
 data.each do |item|
@@ -51,9 +38,14 @@ data.each do |item|
     title: item["title"],
     description: item["description"],
     price: item["price"],
-    stock_quantity: rand(5..99),
+    stock_quantity: item["stock"],
+    discount_percentage: item["discountPercentage"],
     category: category,
-    on_sale: [true, false].sample
+    on_sale: item["discountPercentage"].to_f > 30
   )
+  file = URI.open(item["images"].first)
+  ext = File.extname(URI.parse(file.base_uri.to_s).path)
+  product.image.attach(io: file, filename: "#{product.id}.#{ext}")
 end
+
 AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?
