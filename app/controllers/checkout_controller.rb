@@ -4,19 +4,40 @@ class CheckoutController < ApplicationController
 
   def create
     cart = current_customer.current_cart
-    order = cart.build_pending_order!
+    cart_signature = cart.checkout_signature
+    order = reusable_pending_order(cart_signature)
+
+    if order&.checkout_session_active?
+      redirect_to order.stripe_checkout_url, allow_other_host: true, status: :see_other
+      return
+    end
+
+    cancel_other_pending_orders(order)
+    order&.mark_cancelled!
+    order = cart.build_pending_order!(cart_signature: cart_signature)
 
     session = Stripe::Checkout::Session.create(
-      mode: "payment",
-      client_reference_id: order.id.to_s,
-      customer_email: current_customer.email,
-      success_url: checkout_success_redirect_url,
-      cancel_url: checkout_cancel_redirect_url(order),
-      metadata: {
-        order_id: order.id.to_s,
-        customer_id: current_customer.id.to_s
+      {
+        mode: "payment",
+        client_reference_id: order.id.to_s,
+        customer_email: current_customer.email,
+        success_url: checkout_success_redirect_url,
+        cancel_url: checkout_cancel_redirect_url(order),
+        metadata: {
+          order_id: order.id.to_s,
+          customer_id: current_customer.id.to_s
+        },
+        line_items: stripe_line_items(order)
       },
-      line_items: stripe_line_items(order)
+      {
+        idempotency_key: "checkout-order-#{order.id}"
+      }
+    )
+
+    order.update!(
+      stripe_checkout_session_id: session.id,
+      stripe_checkout_url: session.url,
+      checkout_session_expires_at: checkout_session_expiration(session)
     )
 
     redirect_to session.url, allow_other_host: true, status: :see_other
@@ -85,6 +106,22 @@ class CheckoutController < ApplicationController
 
   def order_id_from_session(session)
     session.metadata&.[]("order_id").presence || session.client_reference_id
+  end
+
+  def reusable_pending_order(cart_signature)
+    current_customer.orders.pending.order(created_at: :desc).find_by(cart_signature: cart_signature)
+  end
+
+  def cancel_other_pending_orders(reused_order)
+    scope = current_customer.orders.pending
+    scope = scope.where.not(id: reused_order.id) if reused_order.present?
+    scope.find_each(&:mark_cancelled!)
+  end
+
+  def checkout_session_expiration(session)
+    return unless session.respond_to?(:expires_at) && session.expires_at.present?
+
+    Time.zone.at(session.expires_at.to_i)
   end
 
   def checkout_breadcrumbs(label)

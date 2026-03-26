@@ -23,14 +23,25 @@ class Cart < ApplicationRecord
     cart_items.includes(:product).sum(&:line_total)
   end
 
-  def build_pending_order!
+  def checkout_signature
+    cart_items.includes(:product).sort_by(&:product_id).map do |cart_item|
+      [
+        cart_item.product_id,
+        cart_item.quantity,
+        cart_item.unit_price.to_d.to_s("F")
+      ].join(":")
+    end.join("|")
+  end
+
+  def build_pending_order!(cart_signature: checkout_signature)
     raise ArgumentError, "Your cart is empty." if cart_items.empty?
 
     transaction do
       order = customer.orders.create!(
         order_date: Time.current,
         total_price: subtotal,
-        status: "pending"
+        status: "pending",
+        cart_signature: cart_signature
       )
 
       cart_items.includes(:product).find_each do |cart_item|

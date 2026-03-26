@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_25_215150) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_25_230500) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -123,7 +123,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_25_215150) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "stripe_checkout_session_id"
+    t.text "stripe_checkout_url"
+    t.datetime "checkout_session_expires_at"
+    t.text "cart_signature"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
+    t.index ["stripe_checkout_session_id"], name: "index_orders_on_stripe_checkout_session_id", unique: true
   end
 
   create_table "products", force: :cascade do |t|

@@ -13,6 +13,10 @@ class Order < ApplicationRecord
     cancelled: "cancelled"
   }
 
+  def checkout_session_active?
+    pending? && stripe_checkout_url.present? && checkout_session_expires_at.present? && checkout_session_expires_at.future?
+  end
+
   def subtotal
     order_items.includes(:product).sum(&:line_total)
   end

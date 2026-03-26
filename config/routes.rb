@@ -18,7 +18,6 @@ Rails.application.routes.draw do
   post "/checkout", to: "checkout#create", as: :checkout
   get "/checkout/success", to: "checkout#success", as: :checkout_success
   get "/checkout/cancel", to: "checkout#cancel", as: :checkout_cancel
-  post "/stripe/webhooks", to: "stripe_webhooks#create"
 
   resources :products, only: %i[index show], controller: "product" do
     post :add_to_cart, on: :member
