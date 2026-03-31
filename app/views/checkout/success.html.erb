@@ -18,9 +18,17 @@
         <span>Order Date</span>
         <strong><%= l(@order.order_date, format: :long) %></strong>
       </div>
+      <div class="checkout-summary__row">
+        <span>Subtotal</span>
+        <strong><%= number_to_currency(@order.subtotal) %></strong>
+      </div>
+      <div class="checkout-summary__row">
+        <span><%= @order.tax_label %></span>
+        <strong><%= number_to_currency(@order.tax_amount) %></strong>
+      </div>
       <div class="checkout-summary__row checkout-summary__row--total">
         <span>Total Paid</span>
-        <strong><%= number_to_currency(@order.total_price) %></strong>
+        <strong><%= number_to_currency(@order.grand_total) %></strong>
       </div>
     </div>
 

@@ -12,6 +12,8 @@ require "faker"
 require "open-uri"
 require "json"
 
+Province.seed_defaults!
+
 Product.delete_all
 # Faker::UniqueGenerator.clear
 

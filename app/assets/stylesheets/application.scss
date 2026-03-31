@@ -539,7 +539,9 @@ body {
 
 .checkout-page__panel,
 .checkout-summary,
-.checkout-item {
+.checkout-item,
+.order-history__panel,
+.order-history__order {
   @extend %surface-panel;
 }
 
@@ -587,6 +589,22 @@ body {
   gap: 1rem;
   padding: 1rem 1.1rem;
   background: #fbfaf6;
+}
+
+.order-history__panel {
+  background: #fffdfa;
+  border: 1px solid #cfc5b3;
+}
+
+.order-history__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.order-history__order {
+  padding: 1.2rem;
+  background: #fffaf1;
 }
 
 .auth-page {
@@ -746,5 +764,9 @@ body {
   .checkout-item {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .order-history__order {
+    padding: 1rem;
   }
 }

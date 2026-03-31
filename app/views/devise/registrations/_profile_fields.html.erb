@@ -21,7 +21,11 @@
 
   <div class="col-md-3">
     <%= f.label :province, class: "form-label fw-semibold" %>
-    <%= f.text_field :province, autocomplete: "address-level1", class: "form-control" %>
+    <%= f.select :province,
+                 options_for_select(Province.ordered.map { |province| [province.display_name, province.code] }, f.object.province_selection_value),
+                 { include_blank: "Select Province/Territory" },
+                 autocomplete: "address-level1",
+                 class: "form-select" %>
   </div>
 
   <div class="col-md-3">

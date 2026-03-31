@@ -1,4 +1,6 @@
 class Order < ApplicationRecord
+  include TaxCalculations
+
   belongs_to :customer
   has_many :order_items, dependent: :destroy
   has_many :products, through: :order_items
@@ -21,13 +23,17 @@ class Order < ApplicationRecord
     order_items.includes(:product).sum(&:line_total)
   end
 
+  def tax_profile
+    customer.province_record
+  end
+
   def mark_paid!
     return if paid?
 
     transaction do
       update!(
         status: "paid",
-        total_price: subtotal,
+        total_price: grand_total,
         order_date: order_date || Time.current
       )
 
@@ -39,6 +45,14 @@ class Order < ApplicationRecord
     return unless pending?
 
     update!(status: "cancelled")
+  end
+
+  def self.ransackable_attributes(_auth_object = nil)
+    ["created_at", "customer_id", "id", "order_date", "status", "total_price", "updated_at"]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    ["customer", "order_items", "products"]
   end
 
   private

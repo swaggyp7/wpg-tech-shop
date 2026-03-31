@@ -1,0 +1,74 @@
+<section class="order-history">
+  <div class="order-history__panel p-3 p-lg-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+      <div>
+        <h1 class="h2 mb-1">My Orders</h1>
+        <p class="checkout-page__meta mb-0">
+          <%= pluralize(@orders.size, "order") %> saved to your account.
+        </p>
+      </div>
+
+      <%= link_to "Continue Shopping", products_path, class: "btn btn-outline-secondary" %>
+    </div>
+
+    <% if @orders.any? %>
+      <div class="order-history__list">
+        <% @orders.each do |order| %>
+          <article class="order-history__order">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+              <div>
+                <h2 class="h4 mb-1">Order #<%= order.id %></h2>
+                <p class="checkout-page__meta mb-0">
+                  Placed <%= l(order.order_date || order.created_at, format: :long) %>
+                </p>
+              </div>
+
+              <span class="badge text-bg-dark"><%= order.status.humanize %></span>
+            </div>
+
+            <div class="checkout-summary mb-3">
+              <div class="checkout-summary__row">
+                <span>Items</span>
+                <strong><%= order.order_items.sum(&:quantity) %></strong>
+              </div>
+              <div class="checkout-summary__row">
+                <span>Subtotal</span>
+                <strong><%= number_to_currency(order.subtotal) %></strong>
+              </div>
+              <div class="checkout-summary__row">
+                <span><%= order.tax_label %></span>
+                <strong><%= number_to_currency(order.tax_amount) %></strong>
+              </div>
+              <div class="checkout-summary__row checkout-summary__row--total">
+                <span>Grand Total</span>
+                <strong><%= number_to_currency(order.grand_total) %></strong>
+              </div>
+            </div>
+
+            <div class="checkout-items">
+              <% order.order_items.each do |order_item| %>
+                <div class="checkout-item">
+                  <div>
+                    <h3 class="h5 mb-1"><%= order_item.product.title %></h3>
+                    <p class="checkout-page__meta mb-0">
+                      <%= pluralize(order_item.quantity, "unit") %> at
+                      <%= number_to_currency(order_item.price_at_purchase) %> each
+                    </p>
+                  </div>
+
+                  <strong><%= number_to_currency(order_item.line_total) %></strong>
+                </div>
+              <% end %>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="catalog-empty p-4">
+        <h2 class="h4 mb-2">No orders yet</h2>
+        <p class="mb-3">Your past orders will appear here after checkout is completed.</p>
+        <%= link_to "Browse Products", products_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</section>

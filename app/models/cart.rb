@@ -1,4 +1,6 @@
 class Cart < ApplicationRecord
+  include TaxCalculations
+
   belongs_to :customer
   has_many :cart_items, dependent: :destroy
   has_many :products, through: :cart_items
@@ -23,6 +25,10 @@ class Cart < ApplicationRecord
     cart_items.includes(:product).sum(&:line_total)
   end
 
+  def tax_profile
+    customer.province_record
+  end
+
   def checkout_signature
     cart_items.includes(:product).sort_by(&:product_id).map do |cart_item|
       [
@@ -37,11 +43,17 @@ class Cart < ApplicationRecord
     raise ArgumentError, "Your cart is empty." if cart_items.empty?
 
     transaction do
+      province = customer.province_record
       order = customer.orders.create!(
         order_date: Time.current,
-        total_price: subtotal,
+        total_price: grand_total,
         status: "pending",
-        cart_signature: cart_signature
+        cart_signature: cart_signature,
+        province_code_snapshot: province&.code,
+        gst_rate_snapshot: province&.gst_rate || 0,
+        pst_rate_snapshot: province&.pst_rate || 0,
+        hst_rate_snapshot: province&.hst_rate || 0,
+        provincial_tax_name_snapshot: province&.provincial_tax_name
       )
 
       cart_items.includes(:product).find_each do |cart_item|

@@ -1,6 +1,7 @@
 class CheckoutController < ApplicationController
   before_action :authenticate_customer!
   before_action :ensure_stripe_checkout_configured!, only: %i[create success]
+  before_action :ensure_customer_province_selected!, only: :create
 
   def create
     cart = current_customer.current_cart
@@ -74,6 +75,13 @@ class CheckoutController < ApplicationController
     redirect_to cart_path, alert: "Stripe test keys are not configured yet."
   end
 
+  def ensure_customer_province_selected!
+    return if current_customer.province_record.present?
+
+    redirect_to edit_customer_registration_path,
+                alert: "Select a valid Canadian province or territory in My Account before checkout."
+  end
+
   def stripe_checkout_configured?
     Rails.configuration.x.stripe.secret_key.present?
   end
@@ -81,7 +89,7 @@ class CheckoutController < ApplicationController
   def stripe_line_items(order)
     currency = Rails.configuration.x.stripe.currency
 
-    order.order_items.map do |order_item|
+    line_items = order.order_items.map do |order_item|
       {
         quantity: order_item.quantity,
         price_data: {
@@ -94,6 +102,22 @@ class CheckoutController < ApplicationController
         }
       }
     end
+
+    return line_items unless order.tax_amount.positive?
+
+    line_items << {
+      quantity: 1,
+      price_data: {
+        currency: currency,
+        unit_amount: (order.tax_amount * 100).round(0).to_i,
+        product_data: {
+          name: order.tax_label,
+          description: "Calculated on the order subtotal at checkout"
+        }
+      }
+    }
+
+    line_items
   end
 
   def checkout_success_redirect_url

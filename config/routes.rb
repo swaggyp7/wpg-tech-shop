@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get "/checkout/success", to: "checkout#success", as: :checkout_success
   get "/checkout/cancel", to: "checkout#cancel", as: :checkout_cancel
 
+  resources :orders, only: %i[index]
   resources :products, only: %i[index show], controller: "product" do
     post :add_to_cart, on: :member
   end

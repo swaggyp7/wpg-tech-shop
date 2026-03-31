@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_25_230500) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_31_121000) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -127,6 +127,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_25_230500) do
     t.text "stripe_checkout_url"
     t.datetime "checkout_session_expires_at"
     t.text "cart_signature"
+    t.string "province_code_snapshot"
+    t.decimal "gst_rate_snapshot", precision: 6, scale: 3
+    t.decimal "pst_rate_snapshot", precision: 6, scale: 3
+    t.decimal "hst_rate_snapshot", precision: 6, scale: 3
+    t.string "provincial_tax_name_snapshot"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["stripe_checkout_session_id"], name: "index_orders_on_stripe_checkout_session_id", unique: true
   end
@@ -142,6 +147,19 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_25_230500) do
     t.boolean "on_sale", default: false
     t.decimal "discount_percentage"
     t.index ["category_id"], name: "index_products_on_category_id"
+  end
+
+  create_table "provinces", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "name", null: false
+    t.decimal "gst_rate", precision: 6, scale: 3, default: "0.0", null: false
+    t.decimal "pst_rate", precision: 6, scale: 3, default: "0.0", null: false
+    t.decimal "hst_rate", precision: 6, scale: 3, default: "0.0", null: false
+    t.string "provincial_tax_name", default: "PST", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_provinces_on_code", unique: true
+    t.index ["name"], name: "index_provinces_on_name", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
