@@ -13,11 +13,15 @@ module ProductHelper
     product.on_sale? && product.discount_percentage.present? && product.discount_percentage.to_d.positive?
   end
 
-  def on_sale_options
+  def new_product?(product)
+    product.created_at.present? && product.created_at >= 3.days.ago
+  end
+
+  def status_options
     [
-      ["All Sale Status", nil],
-      ["On Sale Only", "true"],
-      ["Regular Price Only", "false"]
+      ["All", nil],
+      ["On Sale", "on_sale"],
+      ["Recently Updated", "recently_updated"]
     ]
   end
 

@@ -6,7 +6,7 @@ class ProductController < ApplicationController
     @categories = Category.order(:name)
     @search_query = params[:query].to_s.strip
     @selected_category = Category.find_by(id: params[:category_id]) if params[:category_id].present?
-    @selected_on_sale = params[:on_sale] if %w[true false].include?(params[:on_sale])
+    @selected_status = permitted_status
     @selected_sort = permitted_sort
     @min_price = normalized_price_param(:min_price)
     @max_price = normalized_price_param(:max_price)
@@ -14,7 +14,7 @@ class ProductController < ApplicationController
     @products = Product.includes(:category, image_attachment: :blob)
     @products = apply_query_filter(@products)
     @products = @products.where(category: @selected_category) if @selected_category.present?
-    @products = @products.where(on_sale: ActiveModel::Type::Boolean.new.cast(@selected_on_sale)) if @selected_on_sale.present?
+    @products = apply_status_filter(@products)
     @products = @products.where("products.price >= ?", @min_price) if @min_price.present?
     @products = @products.where("products.price <= ?", @max_price) if @max_price.present?
     @products = @products.order(sort_order).page(params[:page]).per(12)
@@ -51,6 +51,17 @@ class ProductController < ApplicationController
     products.where("LOWER(products.title) LIKE ?", keyword)
   end
 
+  def apply_status_filter(products)
+    case @selected_status
+    when "on_sale"
+      products.where(on_sale: true)
+    when "recently_updated"
+      products.where("products.updated_at >= ?", 3.days.ago)
+    else
+      products
+    end
+  end
+
   def build_index_breadcrumbs
     [
       { label: "Home", path: root_path },
@@ -71,6 +82,13 @@ class ProductController < ApplicationController
 
     allowed_sorts = %w[price_asc price_desc]
     params[:sort] if allowed_sorts.include?(params[:sort])
+  end
+
+  def permitted_status
+    return if params[:status].blank?
+
+    allowed_statuses = %w[on_sale recently_updated]
+    params[:status] if allowed_statuses.include?(params[:status])
   end
 
   def normalized_price_param(key)
