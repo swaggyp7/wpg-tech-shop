@@ -9,9 +9,14 @@ WORKDIR /rails
 
 # Set production environment
 ENV RAILS_ENV="production" \
+    RACK_ENV="production" \
+    RAILS_LOG_TO_STDOUT="true" \
+    RAILS_SERVE_STATIC_FILES="true" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
+    BUNDLE_WITHOUT="development:test" \
+    BUNDLE_JOBS="4" \
+    BUNDLE_RETRY="3"
 
 
 # Throw-away build stage to reduce size of final image
@@ -19,7 +24,8 @@ FROM base as build
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libvips pkg-config
+    apt-get install --no-install-recommends -y build-essential git libsqlite3-dev libvips pkg-config && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
@@ -59,4 +65,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD ["./bin/rails", "server"]
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
