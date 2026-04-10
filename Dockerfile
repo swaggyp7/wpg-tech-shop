@@ -14,6 +14,7 @@ ENV RAILS_ENV="production" \
     RAILS_SERVE_STATIC_FILES="true" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_BUILD__PSYCH="--with-libyaml-dir=/usr" \
     BUNDLE_WITHOUT="development:test" \
     BUNDLE_JOBS="4" \
     BUNDLE_RETRY="3"
@@ -29,6 +30,7 @@ RUN apt-get update -qq && \
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
+RUN test -f /usr/include/yaml.h
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
