@@ -13,6 +13,11 @@ require "json"
 
 Province.seed_defaults!
 
+AdminUser.find_or_create_by!(email: "admin@example.com") do |admin|
+  admin.password = "password"
+  admin.password_confirmation = "password"
+end
+
 seed_demo_data = ENV["SEED_DEMO_DATA"] == "1" || Rails.env.development?
 
 if seed_demo_data
@@ -37,12 +42,5 @@ if seed_demo_data
     file = URI.open(item["images"].first)
     ext = File.extname(URI.parse(file.base_uri.to_s).path)
     product.image.attach(io: file, filename: "#{product.id}.#{ext}")
-  end
-
-  if Rails.env.development?
-    AdminUser.find_or_create_by!(email: "admin@example.com") do |admin|
-      admin.password = "password"
-      admin.password_confirmation = "password"
-    end
   end
 end
